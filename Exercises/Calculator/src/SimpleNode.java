@@ -9,7 +9,7 @@ class SimpleNode implements Node {
     protected Object value;
     protected Calculator parser;
 
-    public int val;
+    public float val;
     public int Op = 0;
 
     public SimpleNode(int i) {

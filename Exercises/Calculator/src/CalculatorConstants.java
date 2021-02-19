@@ -9,9 +9,11 @@ public interface CalculatorConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int INTEGER = 4;
+  int SYMBOL = 4;
   /** RegularExpression Id. */
-  int LF = 5;
+  int INTEGER = 5;
+  /** RegularExpression Id. */
+  int LF = 6;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -22,8 +24,10 @@ public interface CalculatorConstants {
     "\" \"",
     "\"\\r\"",
     "\"\\t\"",
+    "<SYMBOL>",
     "<INTEGER>",
-    "\"\\n\"",
+    "<LF>",
+    "\"=\"",
     "\"+\"",
     "\"-\"",
     "\"*\"",

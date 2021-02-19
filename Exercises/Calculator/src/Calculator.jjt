@@ -1,6 +1,7 @@
 options
 {
-    LOOKAHEAD=1;
+    LOOKAHEAD=2;
+    NODE_DEFAULT_VOID = true;
 }
 
 PARSER_BEGIN(Calculator)
@@ -17,7 +18,7 @@ public class Calculator {
         System.out.println("Expression Value: "+myCalc.eval(root));
     }
 
-    int eval(SimpleNode node) {
+    float eval(SimpleNode node) {
         if (node.jjtGetNumChildren() == 0) // Leaf node with integer value
             return node.val;
 
@@ -29,15 +30,20 @@ public class Calculator {
 
         switch(node.id) {
             case CalculatorTreeConstants.JJTADD:
-                return eval( lhs ) + eval( rhs );
+                return eval(lhs) + eval(rhs);
             case CalculatorTreeConstants.JJTSUB:
-                return eval( lhs ) - eval( rhs );
+                return eval(lhs) - eval(rhs);
             case CalculatorTreeConstants.JJTMUL:
-                return eval( lhs ) * eval( rhs );
+                return eval(lhs) * eval(rhs);
             case CalculatorTreeConstants.JJTDIV:
-                return eval( lhs ) / eval( rhs );
+                return eval(lhs) / eval(rhs);
+            case CalculatorTreeConstants.JJTEQUALS:
+                float value = eval(rhs);
+                lhs.val = value;
+
+                return value;
             default: // abort
-                System.out.println("Ilegal operator!");
+                System.out.println("Illegal operator!");
                 System.exit(1);
         }
 
@@ -54,40 +60,47 @@ SKIP :
 
 TOKEN:
 {
-     < INTEGER: (["0"-"9"])+ >
-    | < LF: "\n" >
+    < SYMBOL: ["A"-"Z","a"-"z"](["0"-"9","A"-"Z","a"-"z"])* >
+    | < INTEGER: (["0"-"9"])+ >
+    | < LF: ["\n", ";"] >
 }
 
 SimpleNode Expression(): {}
 {
-    Expr1() <LF> {return jjtThis;} // Java code inside brackets
+    Expr0() <LF> {return jjtThis;} // Java code inside brackets
 }
 
-void Expr1() #void: {}
+void Expr0(): {Token t;}
 {
-    Expr2(1)
-    [
-        (
-            "+" Expr2(1) #Add(2)
-            | "-" Expr2(1) #Sub(2)
-        )
-    ]
-}
-
-void Expr2(int sign) #void: {} // 1: positive; -1: negative, because of the ‘-‘ unitary operator
-{
-    Expr3(sign)
     (
+        t=<SYMBOL> {jjtThis.value = t.image;} #Symbol
+        "=" Expr1(1) #Equals(2)
+    )
+    | Expr1(1)
+}
+
+void Expr1(int sign): {}
+{
+     Expr2(sign)
+     (
+         ("+" Expr2(sign) #Add(2)
+         | "-" Expr2(sign) #Sub(2))
+     )*
+}
+
+void Expr2(int sign): {} // 1: positive; -1: negative, because of the ‘-‘ unitary operator
+{
+     Expr3(sign)
+     (
         "*" Expr3(1) #Mul(2)
         | "/" Expr3(1) #Div(2)
-    )?
+     )*
 }
+
 void Expr3(int sign): {Token t;}
 {
-    t=<INTEGER>
-    {
-        jjtThis.val = sign *Integer.parseInt(t.image);
-    } #Term
+    t=<INTEGER> { jjtThis.val = sign * Integer.parseInt(t.image); } #Term
+    | t=<SYMBOL> #Symbol
     | "-" Expr3(-1)
-    | "(" Expr1() ")"
+    | "(" Expr1(sign) ")"
 }
