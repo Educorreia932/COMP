@@ -1,0 +1,9 @@
+/bin/
+.gradle/
+/build/
+/generated/
+.idea/
+
+*.dot
+comp2021-*.jar
+local.properties
