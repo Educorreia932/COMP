@@ -14,10 +14,6 @@ public class OllirData {
         this(null, ollirCode);
     }
 
-    public boolean hasReturnVar() {
-        return this.returnVar != null;
-    }
-
     public String getReturnVar() {
         return returnVar;
     }
@@ -25,5 +21,4 @@ public class OllirData {
     public String getOllirCode() {
         return ollirCode;
     }
-
 }

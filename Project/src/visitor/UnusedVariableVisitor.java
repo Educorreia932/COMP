@@ -45,13 +45,8 @@ public class UnusedVariableVisitor extends AJmmVisitor<Boolean, List<Report>> {
         addVisit("VarDeclaration", this::verifyExpression);
         addVisit("IntArray", this::verifyExpression);
         addVisit("Identifier", this::verifyIdentifier);
-        //addVisit("IfStatement", this::verifyIfStatement);
-        //addVisit("WhileStatement", this::verifyIfStatement);
         addVisit("Negate", this::verifyExpression);
         addVisit("MethodReturn", this::verifyExpression);
-
-        //addVisit("Statement1", this::verifyStatement1);
-        //addVisit("Statement2", this::verifyStatement2);
 
         addVisit("Assignment", this::verifyAssignment);
         addVisit("MethodDeclaration", this::verifyMethodDeclaration);
@@ -62,9 +57,8 @@ public class UnusedVariableVisitor extends AJmmVisitor<Boolean, List<Report>> {
     }
 
     public void makeChanges() {
-        for (Runnable change : toRemove) {
+        for (Runnable change : toRemove)
             change.run();
-        }
 
         toRemove.clear();
     }
@@ -118,7 +112,7 @@ public class UnusedVariableVisitor extends AJmmVisitor<Boolean, List<Report>> {
             unusedVariables.put(parameter, new ArrayList<>());
         }
 
-        for(JmmNode child : node.getChildren()){
+        for (JmmNode child : node.getChildren()) {
             visit(child, false);
         }
 
@@ -138,9 +132,11 @@ public class UnusedVariableVisitor extends AJmmVisitor<Boolean, List<Report>> {
             String parentKind = functionParent.getKind();
             if (parentKind.equals("Assignment")) {
                 type = functionParent.getChildren().get(0).get("type");
-            } else if (parentKind.equals("LessThan")) {
+            }
+            else if (parentKind.equals("LessThan")) {
                 type = "int";
-            } else {
+            }
+            else {
                 type = functionParent.get("type");
             }
         }
@@ -152,6 +148,7 @@ public class UnusedVariableVisitor extends AJmmVisitor<Boolean, List<Report>> {
             JmmNode expression = nodeToRemove.getChildren().get(1);
             List<JmmNode> calls = NodeFindingMethods.getCalls(expression);
             int index = nodeToRemove.getParent().getChildren().indexOf(nodeToRemove);
+            
             for (int i = 0; i < calls.size(); i++) {
                 JmmNode call = calls.get(i);
                 String type = deriveFunctionType(call);
@@ -159,20 +156,17 @@ public class UnusedVariableVisitor extends AJmmVisitor<Boolean, List<Report>> {
                 nodeToRemove.getParent().add(call, index + i);
             }
 
-            nodeToRemove.getParent().removeChild(nodeToRemove);
-
-        } else {
-            nodeToRemove.getParent().removeChild(nodeToRemove);
-
         }
+        
+        nodeToRemove.getParent().removeChild(nodeToRemove);
         report_list.add(Utils.newSemanticReport(nodeToRemove, ReportType.WARNING, "Unused variable"));
         isChanged = true;
     }
 
     private List<Report> defaultVisit(JmmNode node, boolean mark_as_used) {
-        for(JmmNode child : node.getChildren()){
+        for (JmmNode child : node.getChildren()) 
             visit(child, mark_as_used);
-        }
+        
         return new ArrayList<>();
     }
 }

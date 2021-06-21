@@ -123,11 +123,16 @@ public class BackendTest {
     }
 
     @Test
-    public void WhileAndIf() {
+    public void WhileAndIfTest() {
         String output = runTest("public/WhileAndIF.jmm");
         String expected = SpecsStrings.normalizeFileContents(SpecsIo.getResource("fixtures/public/WhileAndIF.txt"));
 
         assertEquals(expected, output);
+    }
+    
+    @Test
+    public void TuringTest() {
+        runTest("private/Turing.jmm");
     }
 
     // Custom tests

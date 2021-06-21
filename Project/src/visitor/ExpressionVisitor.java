@@ -1,7 +1,5 @@
 package visitor;
 
-import com.sun.jdi.Value;
-import org.w3c.dom.Node;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
@@ -13,7 +11,6 @@ import table.MySymbolTable;
 import table.ValueSymbol;
 import utils.NodeFindingMethods;
 
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -24,8 +21,6 @@ public class ExpressionVisitor extends PostorderJmmVisitor<Boolean, List<Report>
     MySymbolTable symbolTable;
 
     public List<Report> report_list;
-
-    private List<Symbol> undeclaredVariables = new ArrayList<>();
 
     public ExpressionVisitor(MySymbolTable symbolTable, List<Report> report_list) {
         addVisit("Add", this::verifySumSub);
@@ -55,41 +50,40 @@ public class ExpressionVisitor extends PostorderJmmVisitor<Boolean, List<Report>
     }
 
     private List<Report> verifyStatement1(JmmNode node, Boolean aBoolean) {
-        if(node.getChildren().size() > 0) {
+        if (node.getChildren().size() > 0) {
             JmmNode childNode = node.getChildren().get(0);
-            if (childNode.getOptional("type").isPresent()) {
+            if (childNode.getOptional("type").isPresent())
                 node.put("type", childNode.get("type"));
-            }
-            if (childNode.getOptional("is_array").isPresent()) {
+
+            if (childNode.getOptional("is_array").isPresent())
                 node.put("is_array", childNode.get("is_array"));
-            }
-            if (childNode.getOptional("value").isPresent()) {
+
+            if (childNode.getOptional("value").isPresent())
                 node.put("value", childNode.get("value"));
-            }
-            if (childNode.getOptional("name").isPresent()) {
+
+            if (childNode.getOptional("name").isPresent())
                 node.put("name", childNode.get("name"));
-            }
         }
-        return new ArrayList<Report>();
+
+        return new ArrayList<>();
     }
 
     private List<Report> verifyStatement2(JmmNode node, Boolean aBoolean) {
-        if(node.getChildren().size() > 0) {
+        if (node.getChildren().size() > 0) {
             JmmNode childNode = node.getChildren().get(0);
-            if (childNode.getOptional("type").isPresent()) {
+            if (childNode.getOptional("type").isPresent())
                 node.put("type", childNode.get("type"));
-            }
-            if (childNode.getOptional("is_array").isPresent()) {
+
+            if (childNode.getOptional("is_array").isPresent())
                 node.put("is_array", childNode.get("is_array"));
-            }
-            if (childNode.getOptional("value").isPresent()) {
+
+            if (childNode.getOptional("value").isPresent())
                 node.put("value", childNode.get("value"));
-            }
-            if (childNode.getOptional("name").isPresent()) {
+
+            if (childNode.getOptional("name").isPresent())
                 node.put("name", childNode.get("name"));
-            }
         }
-        return new ArrayList<Report>();
+        return new ArrayList<>();
     }
 
     public List<Report> verifyAnd(JmmNode node, Boolean aBoolean) {
@@ -107,32 +101,34 @@ public class ExpressionVisitor extends PostorderJmmVisitor<Boolean, List<Report>
 
         else {
             Method method;
-            if(firstChild.getOptional("name").isPresent()){
+            if (firstChild.getOptional("name").isPresent()) {
                 method = NodeFindingMethods.FindParentMethod(firstChild, symbolTable);
                 Symbol var = NodeFindingMethods.getVariable(method, symbolTable, firstChild.get("name"));
                 firstChild.put("type", var.getType().getName());
                 firstChild.put("is_array", String.valueOf(var.getType().isArray()));
             }
-            if(secondChild.getOptional("name").isPresent()){
+            if (secondChild.getOptional("name").isPresent()) {
                 method = NodeFindingMethods.FindParentMethod(secondChild, symbolTable);
                 Symbol var = NodeFindingMethods.getVariable(method, symbolTable, secondChild.get("name"));
                 secondChild.put("type", var.getType().getName());
                 secondChild.put("is_array", String.valueOf(var.getType().isArray()));
             }
 
-
-            if ( (!NodeFindingMethods.sameType(firstChild.get("type"), "boolean")) || (!NodeFindingMethods.sameType(firstChild.get("is_array"), "false"))) {
+            if ((!NodeFindingMethods.sameType(firstChild.get("type"), "boolean")) || (!NodeFindingMethods.sameType(firstChild.get("is_array"), "false"))) {
                 reports.add(newSemanticReport(node, ReportType.ERROR, "TypeMismatch: && first operand must be boolean, is " + firstChild.get("type") + (firstChild.get("is_array").equals("true") ? "[]" : "")));
                 report_list.add(newSemanticReport(node, ReportType.ERROR, "TypeMismatch: && first operand must be boolean, is " + firstChild.get("type") + (firstChild.get("is_array").equals("true") ? "[]" : "")));
+
                 return reports;
             }
 
             if ((!NodeFindingMethods.sameType(secondChild.get("type"), "boolean")) || (!NodeFindingMethods.sameType(secondChild.get("is_array"), "false"))) {
                 reports.add(newSemanticReport(node, ReportType.ERROR, "TypeMismatch: && second operand must be boolean, is " + secondChild.get("type") + (secondChild.get("is_array").equals("true") ? "[]" : "")));
                 report_list.add(newSemanticReport(node, ReportType.ERROR, "TypeMismatch: && second operand must be boolean, is " + secondChild.get("type") + (secondChild.get("is_array").equals("true") ? "[]" : "")));
+
                 return reports;
             }
         }
+
         return reports;
     }
 
@@ -172,7 +168,6 @@ public class ExpressionVisitor extends PostorderJmmVisitor<Boolean, List<Report>
         node.put("is_array", "false");
         List<Report> reports = new ArrayList<>();
 
-
         JmmNode firstChild = node.getChildren().get(0);
         JmmNode secondChild = node.getChildren().get(1);
         if (variablesNotDeclared(firstChild, secondChild, reports))
@@ -180,32 +175,39 @@ public class ExpressionVisitor extends PostorderJmmVisitor<Boolean, List<Report>
 
         else {
             Method method;
-            if(firstChild.getOptional("name").isPresent()){
+
+            if (firstChild.getOptional("name").isPresent()) {
                 method = NodeFindingMethods.FindParentMethod(firstChild, symbolTable);
                 Symbol var = NodeFindingMethods.getVariable(method, symbolTable, firstChild.get("name"));
-                if(var == null){
-                    reports.add(newSemanticReport(node, ReportType.WARNING,"Undeclared variable"));
-                    report_list.add(newSemanticReport(node, ReportType.WARNING,"Undeclared variable"));
+
+                if (var == null) {
+                    reports.add(newSemanticReport(node, ReportType.WARNING, "Undeclared variable"));
+                    report_list.add(newSemanticReport(node, ReportType.WARNING, "Undeclared variable"));
                     return reports;
                 }
-                if(!firstChild.getOptional("type").isPresent()) {
+
+                if (firstChild.getOptional("type").isEmpty()) {
                     firstChild.put("type", var.getType().getName());
                 }
-                if(!firstChild.getOptional("is_array").isPresent()) {
+                if (firstChild.getOptional("is_array").isEmpty()) {
                     firstChild.put("is_array", String.valueOf(var.getType().isArray()));
                 }
             }
-            if(secondChild.getOptional("name").isPresent()){
+
+            if (secondChild.getOptional("name").isPresent()) {
                 method = NodeFindingMethods.FindParentMethod(secondChild, symbolTable);
                 Symbol var = NodeFindingMethods.getVariable(method, symbolTable, secondChild.get("name"));
-                if(var == null){
-                    reports.add(newSemanticReport(node, ReportType.WARNING,"Undeclared variable"));
-                    report_list.add(newSemanticReport(node, ReportType.WARNING,"Undeclared variable"));
+
+                if (var == null) {
+                    reports.add(newSemanticReport(node, ReportType.WARNING, "Undeclared variable"));
+                    report_list.add(newSemanticReport(node, ReportType.WARNING, "Undeclared variable"));
                     return reports;
                 }
-                if(!secondChild.getOptional("type").isPresent())
+
+                if (secondChild.getOptional("type").isEmpty())
                     secondChild.put("type", var.getType().getName());
-                if(!secondChild.getOptional("is_array").isPresent())
+
+                if (secondChild.getOptional("is_array").isEmpty())
                     secondChild.put("is_array", String.valueOf(var.getType().isArray()));
             }
 
@@ -216,7 +218,7 @@ public class ExpressionVisitor extends PostorderJmmVisitor<Boolean, List<Report>
                 return reports;
             }
 
-            if ( (!NodeFindingMethods.sameType(secondChild.get("type"), "int")) || (!NodeFindingMethods.sameType(secondChild.get("is_array"), "false"))) {
+            if ((!NodeFindingMethods.sameType(secondChild.get("type"), "int")) || (!NodeFindingMethods.sameType(secondChild.get("is_array"), "false"))) {
                 reports.add(newSemanticReport(node, ReportType.ERROR, "TypeMismatch: + second operand must be int, is " + secondChild.get("type") + (secondChild.get("is_array").equals("true") ? "[]" : "")));
                 report_list.add(newSemanticReport(node, ReportType.ERROR, "TypeMismatch: + second operand must be int, is " + secondChild.get("type") + (secondChild.get("is_array").equals("true") ? "[]" : "")));
 
@@ -238,15 +240,15 @@ public class ExpressionVisitor extends PostorderJmmVisitor<Boolean, List<Report>
                 Symbol symbol = NodeFindingMethods.getVariable(method, symbolTable, firstChild.get("name"));
 
                 if (symbol == null) {
-                    reports.add(newSemanticReport(firstChild, ReportType.ERROR,"UndeclaredVariable: First variable hasn't been declared"));
-                    report_list.add(newSemanticReport(firstChild, ReportType.ERROR,"UndeclaredVariable: First variable hasn't been declared"));
+                    reports.add(newSemanticReport(firstChild, ReportType.ERROR, "UndeclaredVariable: First variable hasn't been declared"));
+                    report_list.add(newSemanticReport(firstChild, ReportType.ERROR, "UndeclaredVariable: First variable hasn't been declared"));
 
                     return true;
                 }
 
                 if (!((ValueSymbol) symbol).hasValue()) {
-                    reports.add(newSemanticReport(firstChild, ReportType.ERROR,"UndeclaredVariable: First variable hasn't been given a value"));
-                    report_list.add(newSemanticReport(firstChild, ReportType.ERROR,"UndeclaredVariable: First variable hasn't been given a value"));
+                    reports.add(newSemanticReport(firstChild, ReportType.ERROR, "UndeclaredVariable: First variable hasn't been given a value"));
+                    report_list.add(newSemanticReport(firstChild, ReportType.ERROR, "UndeclaredVariable: First variable hasn't been given a value"));
 
                     return true;
                 }
@@ -261,15 +263,15 @@ public class ExpressionVisitor extends PostorderJmmVisitor<Boolean, List<Report>
                 Symbol symbol = NodeFindingMethods.getVariable(method, symbolTable, secondChild.get("name"));
 
                 if (symbol == null) {
-                    reports.add(newSemanticReport(secondChild, ReportType.ERROR,"UndeclaredVariable: Second variable hasnt been declared"));
-                    report_list.add(newSemanticReport(secondChild, ReportType.ERROR,"UndeclaredVariable: Second variable hasnt been declared"));
+                    reports.add(newSemanticReport(secondChild, ReportType.ERROR, "UndeclaredVariable: Second variable hasnt been declared"));
+                    report_list.add(newSemanticReport(secondChild, ReportType.ERROR, "UndeclaredVariable: Second variable hasnt been declared"));
 
                     return false;
                 }
 
                 if (!((ValueSymbol) symbol).hasValue()) {
-                    reports.add(newSemanticReport(secondChild, ReportType.ERROR,"UndeclaredVariable: Second variable hasnt been given a value"));
-                    report_list.add(newSemanticReport(secondChild, ReportType.ERROR,"UndeclaredVariable: Second variable hasnt been given a value"));
+                    reports.add(newSemanticReport(secondChild, ReportType.ERROR, "UndeclaredVariable: Second variable hasnt been given a value"));
+                    report_list.add(newSemanticReport(secondChild, ReportType.ERROR, "UndeclaredVariable: Second variable hasnt been given a value"));
 
                     return false;
                 }
@@ -286,18 +288,18 @@ public class ExpressionVisitor extends PostorderJmmVisitor<Boolean, List<Report>
                 //Check if identifier is declared
                 Method method = NodeFindingMethods.FindParentMethod(child);
                 method = symbolTable.getMethod(method);
-                Symbol symbol = NodeFindingMethods.getVariable(method, symbolTable, child.get("name"));
+                ValueSymbol symbol = NodeFindingMethods.getVariable(method, symbolTable, child.get("name"));
 
                 if (symbol == null) {
-                    reports.add(newSemanticReport(child, ReportType.ERROR,"UndeclaredVariable: First variable hasn't been declared"));
-                    report_list.add(newSemanticReport(child, ReportType.ERROR,"UndeclaredVariable: First variable hasn't been declared"));
+                    reports.add(newSemanticReport(child, ReportType.ERROR, "UndeclaredVariable: First variable hasn't been declared"));
+                    report_list.add(newSemanticReport(child, ReportType.ERROR, "UndeclaredVariable: First variable hasn't been declared"));
 
                     return true;
                 }
 
-                if (!((ValueSymbol) symbol).hasValue()) {
-                    reports.add(newSemanticReport(child, ReportType.ERROR,"UndeclaredVariable: First variable hasn't been given a value"));
-                    report_list.add(newSemanticReport(child, ReportType.ERROR,"UndeclaredVariable: First variable hasn't been given a value"));
+                if (!symbol.hasValue()) {
+                    reports.add(newSemanticReport(child, ReportType.ERROR, "UndeclaredVariable: First variable hasn't been given a value"));
+                    report_list.add(newSemanticReport(child, ReportType.ERROR, "UndeclaredVariable: First variable hasn't been given a value"));
 
                     return true;
                 }
@@ -315,11 +317,11 @@ public class ExpressionVisitor extends PostorderJmmVisitor<Boolean, List<Report>
         JmmNode child = node.getChildren().get(0);
 
         //TODO: Add report
-        if(child.getOptional("type").isEmpty()){
+        if (child.getOptional("type").isEmpty()) {
 
             return reports;
         }
-        if(child.getOptional("is_array").isEmpty()){
+        if (child.getOptional("is_array").isEmpty()) {
             return reports;
         }
 
@@ -332,36 +334,40 @@ public class ExpressionVisitor extends PostorderJmmVisitor<Boolean, List<Report>
     public List<Report> verifyIndex(JmmNode node, Boolean aBoolean) {
         //TODO: Check if there are multidimensional arrays
         List<Report> reports = new ArrayList<>();
-        node.put("type" , "");
+        node.put("type", "");
         node.put("is_array", "false");
 
-
         JmmNode array = node.getChildren().get(0);
-        if(array.getOptional("name").isEmpty()){
-            reports.add(newSemanticReport(node, ReportType.ERROR,"TypeMismatch: Array type expected; found: " + NodeFindingMethods.getTypeStringReport(node.getChildren().get(0))));
-            report_list.add(newSemanticReport(node, ReportType.ERROR,"TypeMismatch: Array type expected; found: " + NodeFindingMethods.getTypeStringReport(node.getChildren().get(0))));
+
+        if (array.getOptional("name").isEmpty()) {
+            reports.add(newSemanticReport(node, ReportType.ERROR, "TypeMismatch: Array type expected; found: " + NodeFindingMethods.getTypeStringReport(node.getChildren().get(0))));
+            report_list.add(newSemanticReport(node, ReportType.ERROR, "TypeMismatch: Array type expected; found: " + NodeFindingMethods.getTypeStringReport(node.getChildren().get(0))));
 
             System.out.println("Non variable used as array for index");
+
             return reports;
         }
-        if(!(array.get("is_array").equals("true"))){
-            reports.add(newSemanticReport(node, ReportType.ERROR,"TypeMismatch: Array type expected; found: " + NodeFindingMethods.getTypeStringReport(node.getChildren().get(0))));
-            report_list.add(newSemanticReport(node, ReportType.ERROR,"TypeMismatch: Array type expected; found: " + NodeFindingMethods.getTypeStringReport(node.getChildren().get(0))));
-            return reports;
-        }
-        if(variablesNotDeclared(array, reports)){
-            reports.add(newSemanticReport(node, ReportType.ERROR,"UndeclaredVariable: Cannot resolve symbol " + node.getOptional("name")));
-            report_list.add(newSemanticReport(node, ReportType.ERROR,"UndeclaredVariable: Cannot resolve symbol " + node.getOptional("name")));
+        if (!(array.get("is_array").equals("true"))) {
+            reports.add(newSemanticReport(node, ReportType.ERROR, "TypeMismatch: Array type expected; found: " + NodeFindingMethods.getTypeStringReport(node.getChildren().get(0))));
+            report_list.add(newSemanticReport(node, ReportType.ERROR, "TypeMismatch: Array type expected; found: " + NodeFindingMethods.getTypeStringReport(node.getChildren().get(0))));
+
             return reports;
         }
 
+        if (variablesNotDeclared(array, reports)) {
+            reports.add(newSemanticReport(node, ReportType.ERROR, "UndeclaredVariable: Cannot resolve symbol " + node.getOptional("name")));
+            report_list.add(newSemanticReport(node, ReportType.ERROR, "UndeclaredVariable: Cannot resolve symbol " + node.getOptional("name")));
+
+            return reports;
+        }
 
         JmmNode index = node.getChildren().get(1);
 
-        if((!NodeFindingMethods.sameType(index.get("type"), "int")) || (!NodeFindingMethods.sameType(index.get("is_array"), "false"))){
+        if ((!NodeFindingMethods.sameType(index.get("type"), "int")) || (!NodeFindingMethods.sameType(index.get("is_array"), "false"))) {
             //TODO: Semantic error, index isn't int
-            reports.add(newSemanticReport(node, ReportType.ERROR,"UndeclaredVariable: Cannot resolve symbol " + node.getOptional("name")));
-            report_list.add(newSemanticReport(node, ReportType.ERROR,"UndeclaredVariable: Cannot resolve symbol " + node.getOptional("name")));
+            reports.add(newSemanticReport(node, ReportType.ERROR, "UndeclaredVariable: Cannot resolve symbol " + node.getOptional("name")));
+            report_list.add(newSemanticReport(node, ReportType.ERROR, "UndeclaredVariable: Cannot resolve symbol " + node.getOptional("name")));
+
             return reports;
         }
 
@@ -371,35 +377,34 @@ public class ExpressionVisitor extends PostorderJmmVisitor<Boolean, List<Report>
         return reports;
     }
 
-    public List<Report> verifyCall(JmmNode node, Boolean aBoolean){
+    public List<Report> verifyCall(JmmNode node, Boolean aBoolean) {
         node.put("type", "");
         node.put("is_array", "");
         List<Report> reports = new ArrayList<>();
 
-
-        if (node.getChildren().size() == 2){
+        if (node.getChildren().size() == 2) {
             //Check if it's a length call, if it is, the thing calling it has to be an array
-            if (node.getChildren().get(1).getKind().equals("Length")){
+            if (node.getChildren().get(1).getKind().equals("Length")) {
                 node.put("type", "int");
                 node.put("is_array", "false");
                 if (node.getChildren().get(0).getOptional("name").isPresent()) {
                     Method method = NodeFindingMethods.FindParentMethod(node, symbolTable);
 
                     //If it has a method, find in method and then symbol table
-                    if(method != null){
-                        if(method.getLocalVariable(node.getChildren().get(0).get("name")) == null) {
-                            if(symbolTable.getField(node.getChildren().get(0).get("name")) == null) {
-                                reports.add(newSemanticReport(node, ReportType.WARNING,"UndeclaredVariable: .length operand must be int"));
-                                report_list.add(newSemanticReport(node, ReportType.WARNING,"UndeclaredVariable:  .length operand must be int"));
+                    if (method != null) {
+                        if (method.getLocalVariable(node.getChildren().get(0).get("name")) == null) {
+                            if (symbolTable.getField(node.getChildren().get(0).get("name")) == null) {
+                                reports.add(newSemanticReport(node, ReportType.WARNING, "UndeclaredVariable: .length operand must be int"));
+                                report_list.add(newSemanticReport(node, ReportType.WARNING, "UndeclaredVariable:  .length operand must be int"));
 
                                 return reports;
                             }
                         }
                     }
                     //If it doesn't have a method, find in symbol table only
-                    else if (symbolTable.getField(node.getChildren().get(0).get("name")) == null){
-                        reports.add(newSemanticReport(node, ReportType.WARNING,"UndeclaredVariable: .length operand must be int\""));
-                        report_list.add(newSemanticReport(node, ReportType.WARNING,"UndeclaredVariable: .length operand must be int\""));
+                    else if (symbolTable.getField(node.getChildren().get(0).get("name")) == null) {
+                        reports.add(newSemanticReport(node, ReportType.WARNING, "UndeclaredVariable: .length operand must be int\""));
+                        report_list.add(newSemanticReport(node, ReportType.WARNING, "UndeclaredVariable: .length operand must be int\""));
 
                         return reports;
                     }
@@ -409,16 +414,16 @@ public class ExpressionVisitor extends PostorderJmmVisitor<Boolean, List<Report>
 
                     return reports;
                 }
-                else if((NodeFindingMethods.sameType(node.getChildren().get(0).get("is_array"), "true"))) {
+                else if ((NodeFindingMethods.sameType(node.getChildren().get(0).get("is_array"), "true"))) {
                     node.put("type", "int");
                     node.put("is_array", "false");
 
                     return reports;
                 }
 
-                else{
-                    reports.add(newSemanticReport(node, ReportType.ERROR,"TypeMismatch: Array type expected;"));
-                    report_list.add(newSemanticReport(node, ReportType.ERROR,"TypeMismatch: Array type expected;"));
+                else {
+                    reports.add(newSemanticReport(node, ReportType.ERROR, "TypeMismatch: Array type expected;"));
+                    report_list.add(newSemanticReport(node, ReportType.ERROR, "TypeMismatch: Array type expected;"));
 
                     return reports;
                 }
@@ -427,34 +432,30 @@ public class ExpressionVisitor extends PostorderJmmVisitor<Boolean, List<Report>
             boolean ownFunction = node.getChildren().get(0).getKind().equals("This");
 
             //this.etc()
-            if(!ownFunction){
-
+            if (!ownFunction) {
                 Optional<String> opName = node.getChildren().get(0).getOptional("name");
-                if(opName.isEmpty()){
-                    if(node.getChildren().get(0).get("type") == symbolTable.getClassName() && symbolTable.getSuper() == null){
 
-
+                if (opName.isEmpty()) {
+                    if (node.getChildren().get(0).get("type") == symbolTable.getClassName() && symbolTable.getSuper() == null) {
                         List<ValueSymbol> arguments = new ArrayList<>();
 
                         //Get function arguments;
-                        for (int i = 0; i < node.getChildren().get(1).getChildren().size(); i++){
+                        for (int i = 0; i < node.getChildren().get(1).getChildren().size(); i++)
                             arguments.add(new ValueSymbol(new Type(node.getChildren().get(1).getChildren().get(i).get("type"), Boolean.parseBoolean(node.getChildren().get(1).getChildren().get(i).get("is_array"))), "-", false));
 
+                        if (node.getChildren().get(1).getOptional("name").isEmpty()) {
+                            reports.add(newSemanticReport(node, ReportType.ERROR, "UndeclaredMethod: Cannot resolve method"));
+                            report_list.add(newSemanticReport(node, ReportType.ERROR, "UndeclaredMethod: Cannot resolve method"));
                         }
 
-
-                        if(node.getChildren().get(1).getOptional("name").isEmpty()){
-                            reports.add(newSemanticReport(node, ReportType.ERROR,"UndeclaredMethod: Cannot resolve method"));
-                            report_list.add(newSemanticReport(node, ReportType.ERROR,"UndeclaredMethod: Cannot resolve method"));
-                        }
                         if (!symbolTable.methodExists(node.getChildren().get(1).get("name"), arguments)) {
                             //TODO: Exception
-                            reports.add(newSemanticReport(node, ReportType.ERROR,"UndeclaredMethod: Cannot resolve method " + node.getChildren().get(1).get("name")));
-                            report_list.add(newSemanticReport(node, ReportType.ERROR,"UndeclaredMethod: Cannot resolve method " + node.getChildren().get(1).get("name")));
+                            reports.add(newSemanticReport(node, ReportType.ERROR, "UndeclaredMethod: Cannot resolve method " + node.getChildren().get(1).get("name")));
+                            report_list.add(newSemanticReport(node, ReportType.ERROR, "UndeclaredMethod: Cannot resolve method " + node.getChildren().get(1).get("name")));
 
                             System.out.println("Method does not exist. Line " + node.getChildren().get(1).get("line"));
                         }
-                        else{
+                        else {
                             Method m = symbolTable.getMethod(node.getChildren().get(1).get("name"), arguments);
                             node.put("type", m.getReturnType().getName());
                             node.put("is_array", String.valueOf(m.getReturnType().isArray()));
@@ -468,7 +469,7 @@ public class ExpressionVisitor extends PostorderJmmVisitor<Boolean, List<Report>
                 String name = opName.get();
 
                 //If it's an import
-                if(symbolTable.importExists(name)){
+                if (symbolTable.importExists(name)) {
                     node.put("type", "");
                     node.put("is_array", "");
                     return reports;
@@ -476,38 +477,38 @@ public class ExpressionVisitor extends PostorderJmmVisitor<Boolean, List<Report>
 
                 Method method = NodeFindingMethods.FindParentMethod(node, symbolTable);
                 ValueSymbol symbol;
-                if(method != null) {
+                if (method != null) {
                     symbol = NodeFindingMethods.getVariable(method, symbolTable, name);
                 }
-                else{
+                else {
                     symbol = NodeFindingMethods.getVariable(symbolTable, name);
                 }
-                if(symbol != null){
-                    if(!symbol.hasValue()){
-                        reports.add(newSemanticReport(node, ReportType.ERROR,"UndeclaredVariable: Cannot resolve symbol " + node.getChildren().get(0).get("name")));
-                        report_list.add(newSemanticReport(node, ReportType.ERROR,"UndeclaredVariable: Cannot resolve symbol " + node.getChildren().get(0).get("name")));
+                if (symbol != null) {
+                    if (!symbol.hasValue()) {
+                        reports.add(newSemanticReport(node, ReportType.ERROR, "UndeclaredVariable: Cannot resolve symbol " + node.getChildren().get(0).get("name")));
+                        report_list.add(newSemanticReport(node, ReportType.ERROR, "UndeclaredVariable: Cannot resolve symbol " + node.getChildren().get(0).get("name")));
 
                         System.out.println("error: uninitialized variable calling method");
                         return reports;
                     }
-                    if(symbol.getType().getName().equals(symbolTable.getClassName()) && symbolTable.getSuper() == null){
+                    if (symbol.getType().getName().equals(symbolTable.getClassName()) && symbolTable.getSuper() == null) {
                         //See if method exists
                         ownFunction = true;
                     }
-                    else if(symbol.getType().getName().equals(symbolTable.getClassName()) && symbolTable.getSuper() != null){
+                    else if (symbol.getType().getName().equals(symbolTable.getClassName()) && symbolTable.getSuper() != null) {
                         node.put("type", "");
                         node.put("is_array", "");
                         return reports;
                     }
                 }
-                else{
-                    reports.add(newSemanticReport(node, ReportType.ERROR,"UndeclaredMethod: Cannot resolve method " + node.getChildren().get(1).get("name")));
-                    report_list.add(newSemanticReport(node, ReportType.ERROR,"UndeclaredMethod: Cannot resolve method " + node.getChildren().get(1).get("name")));
+                else {
+                    reports.add(newSemanticReport(node, ReportType.ERROR, "UndeclaredMethod: Cannot resolve method " + node.getChildren().get(1).get("name")));
+                    report_list.add(newSemanticReport(node, ReportType.ERROR, "UndeclaredMethod: Cannot resolve method " + node.getChildren().get(1).get("name")));
 
                     System.out.println("error: uninitialized variable calling method");
                     return reports;
                 }
-                if(!ownFunction) {
+                if (!ownFunction) {
                     node.put("type", symbol.getType().getName());
                     node.put("is_array", String.valueOf(symbol.getType().isArray()));
                     return reports;
@@ -516,67 +517,62 @@ public class ExpressionVisitor extends PostorderJmmVisitor<Boolean, List<Report>
 
             }
             //DO NOT DO ELSE IF, THIS VALUE IS CHANGED IN THE FIRST IF
-            if(ownFunction) {
-                //Get arguments
-                //Is the method in the table?
+            //Get arguments
+            //Is the method in the table?
 
-                List<ValueSymbol> arguments = new ArrayList<>();
+            List<ValueSymbol> arguments = new ArrayList<>();
 
-                //Get function arguments;
-                for (int i = 0; i < node.getChildren().get(1).getChildren().size(); i++){
-                    arguments.add(new ValueSymbol(new Type(node.getChildren().get(1).getChildren().get(i).get("type"), Boolean.parseBoolean(node.getChildren().get(1).getChildren().get(i).get("is_array"))), "-", false));
+            //Get function arguments;
+            for (int i = 0; i < node.getChildren().get(1).getChildren().size(); i++)
+                arguments.add(new ValueSymbol(new Type(node.getChildren().get(1).getChildren().get(i).get("type"), Boolean.parseBoolean(node.getChildren().get(1).getChildren().get(i).get("is_array"))), "-", false));
 
-                }
-                if (!symbolTable.methodExists(node.getChildren().get(1).get("name"), arguments)) {
-                    if(symbolTable.getSuper() == null){
-                        //TODO: Add report
-                        reports.add(newSemanticReport(node, ReportType.ERROR,"UndeclaredMethod: Cannot resolve method " + node.getChildren().get(1).get("name")));
-                        report_list.add(newSemanticReport(node, ReportType.ERROR,"UndeclaredMethod: Cannot resolve method " + node.getChildren().get(1).get("name")));
-                        System.out.println("Undeclared method, add report here and stop execution");
+            if (!symbolTable.methodExists(node.getChildren().get(1).get("name"), arguments)) {
+                if (symbolTable.getSuper() == null) {
+                    //TODO: Add report
+                    reports.add(newSemanticReport(node, ReportType.ERROR, "UndeclaredMethod: Cannot resolve method " + node.getChildren().get(1).get("name")));
+                    report_list.add(newSemanticReport(node, ReportType.ERROR, "UndeclaredMethod: Cannot resolve method " + node.getChildren().get(1).get("name")));
+                    System.out.println("Undeclared method, add report here and stop execution");
 
-                        return reports;
-                    }
-                    //The method could be from the superclass if none is found with the same name and arguments
-                    else{
-                        node.put("type", "");
-                        node.put("is_array", "");
-                    }
-                }
-                //if method exists with same arguments
-                else{
-                    Method method = symbolTable.getMethod(node.getChildren().get(1).get("name"), arguments);
-                    node.put("type", method.getReturnType().getName());
-                    node.put("is_array", String.valueOf(method.getReturnType().isArray()));
                     return reports;
                 }
+                //The method could be from the superclass if none is found with the same name and arguments
+                else {
+                    node.put("type", "");
+                    node.put("is_array", "");
+                }
+            }
+            //if method exists with same arguments
+            else {
+                Method method = symbolTable.getMethod(node.getChildren().get(1).get("name"), arguments);
+                node.put("type", method.getReturnType().getName());
+                node.put("is_array", String.valueOf(method.getReturnType().isArray()));
+                return reports;
             }
             // <import_name>.etc()
             //  or
             // varName.etc()
 
-
             return reports;
         }
-        else{
-        }
+
         return reports;
     }
 
-    public List<Report> varAssignment(JmmNode node, Boolean aBoolean){
+    public List<Report> varAssignment(JmmNode node, Boolean aBoolean) {
         node.put("type", "");
         node.put("is_array", "");
         List<Report> reports = new ArrayList<>();
 
         //Without index
-        if(node.getChildren().size() == 2){
-            if(node.getChildren().get(0).getOptional("name").isEmpty()){
+        if (node.getChildren().size() == 2) {
+            if (node.getChildren().get(0).getOptional("name").isEmpty()) {
                 //TODO: Index on non variable error
-                reports.add(newSemanticReport(node, ReportType.ERROR,"TypeMismatch: Array type expected; found: " + node.getChildren().get(0).getOptional("type")));
-                report_list.add(newSemanticReport(node, ReportType.ERROR,"TypeMismatch: Array type expected; found: " + node.getChildren().get(0).getOptional("type")));
+                reports.add(newSemanticReport(node, ReportType.ERROR, "TypeMismatch: Array type expected; found: " + node.getChildren().get(0).getOptional("type")));
+                report_list.add(newSemanticReport(node, ReportType.ERROR, "TypeMismatch: Array type expected; found: " + node.getChildren().get(0).getOptional("type")));
                 return reports;
             }
             //TODO: add report
-            if(node.getChildren().get(0).getOptional("type").isEmpty() || node.getChildren().get(0).getOptional("is_array").isEmpty()) {
+            if (node.getChildren().get(0).getOptional("type").isEmpty() || node.getChildren().get(0).getOptional("is_array").isEmpty()) {
                 //reports.add(newSemanticReport(node, "Cannot resolve symbol " + node.getChildren().get(0).get("name")));
                 return reports;
             }
@@ -584,21 +580,21 @@ public class ExpressionVisitor extends PostorderJmmVisitor<Boolean, List<Report>
             Method method = NodeFindingMethods.FindParentMethod(node, symbolTable);
             ValueSymbol var_symbol = NodeFindingMethods.getVariable(method, symbolTable, node.getChildren().get(0).get("name"));
 
-            if(var_symbol == null){
-                reports.add(newSemanticReport(node, ReportType.ERROR,"UndeclaredVariable: Cannot resolve symbol " + node.getChildren().get(0).get("name")));
-                report_list.add(newSemanticReport(node, ReportType.ERROR,"UndeclaredVariable: Cannot resolve symbol " + node.getChildren().get(0).get("name")));
+            if (var_symbol == null) {
+                reports.add(newSemanticReport(node, ReportType.ERROR, "UndeclaredVariable: Cannot resolve symbol " + node.getChildren().get(0).get("name")));
+                report_list.add(newSemanticReport(node, ReportType.ERROR, "UndeclaredVariable: Cannot resolve symbol " + node.getChildren().get(0).get("name")));
 
                 return reports;
             }
-            else if((var_symbol.getType().isArray() == false) && node.getChildren().get(1).get("is_array").equals("true")){
-                reports.add(newSemanticReport(node, ReportType.ERROR,"UndeclaredVariable: Variable " + node.getChildren().get(0).get("name") + " shouldn't be an array but is."));
-                report_list.add(newSemanticReport(node, ReportType.ERROR,"UndeclaredVariable: Variable " + node.getChildren().get(0).get("name") + " shouldn't be an array but is."));
+            else if ((var_symbol.getType().isArray() == false) && node.getChildren().get(1).get("is_array").equals("true")) {
+                reports.add(newSemanticReport(node, ReportType.ERROR, "UndeclaredVariable: Variable " + node.getChildren().get(0).get("name") + " shouldn't be an array but is."));
+                report_list.add(newSemanticReport(node, ReportType.ERROR, "UndeclaredVariable: Variable " + node.getChildren().get(0).get("name") + " shouldn't be an array but is."));
 
                 return reports;
             }
-            else if(!NodeFindingMethods.sameType(node.getChildren().get(1).get("type"), var_symbol.getType().getName())){
-                reports.add(newSemanticReport(node, ReportType.ERROR,"TypeMismatch: Expected type: " + var_symbol.getType().getName() + ", got type " + node.getChildren().get(1).get("type")));
-                report_list.add(newSemanticReport(node, ReportType.ERROR,"TypeMismatch: Expected type: " + var_symbol.getType().getName() + ", got type " + node.getChildren().get(1).get("type")));
+            else if (!NodeFindingMethods.sameType(node.getChildren().get(1).get("type"), var_symbol.getType().getName())) {
+                reports.add(newSemanticReport(node, ReportType.ERROR, "TypeMismatch: Expected type: " + var_symbol.getType().getName() + ", got type " + node.getChildren().get(1).get("type")));
+                report_list.add(newSemanticReport(node, ReportType.ERROR, "TypeMismatch: Expected type: " + var_symbol.getType().getName() + ", got type " + node.getChildren().get(1).get("type")));
 
                 return reports;
             }
@@ -608,12 +604,12 @@ public class ExpressionVisitor extends PostorderJmmVisitor<Boolean, List<Report>
         return reports;
     }
 
-    public List<Report> varDeclaration(JmmNode node, Boolean aBoolean){
+    public List<Report> varDeclaration(JmmNode node, Boolean aBoolean) {
         List<Report> reports = new ArrayList<>();
 
-        if(node.getOptional("name").isEmpty()){
-            reports.add(newSemanticReport(node, ReportType.ERROR,"UndeclaredVariable: Assignment to non variable"));
-            report_list.add(newSemanticReport(node, ReportType.ERROR,"UndeclaredVariable: Assignment to non variable"));
+        if (node.getOptional("name").isEmpty()) {
+            reports.add(newSemanticReport(node, ReportType.ERROR, "UndeclaredVariable: Assignment to non variable"));
+            report_list.add(newSemanticReport(node, ReportType.ERROR, "UndeclaredVariable: Assignment to non variable"));
             return reports;
         }
 
@@ -625,50 +621,54 @@ public class ExpressionVisitor extends PostorderJmmVisitor<Boolean, List<Report>
         Method method = NodeFindingMethods.FindParentMethod(node, symbolTable);
 
         //Add to class' (global) symbol table
-        if(method == null){
-            if(!symbolTable.fieldExists(symbol)) {
+        if (method == null) {
+            if (!symbolTable.fieldExists(symbol))
                 symbolTable.addField(varType, varName, false);
-                return reports;
-            }
-            else{
-                reports.add(newSemanticReport(node, ReportType.ERROR,"VariableRedefinition: Variable " + symbol + " is already defined in the scope"));
-                report_list.add(newSemanticReport(node, ReportType.ERROR,"VariableRedefinition: Variable " + symbol + " is already defined in the scope"));
 
-                return reports;
+            else {
+                reports.add(newSemanticReport(node, ReportType.ERROR, "VariableRedefinition: Variable " + symbol + " is already defined in the scope"));
+                report_list.add(newSemanticReport(node, ReportType.ERROR, "VariableRedefinition: Variable " + symbol + " is already defined in the scope"));
             }
+
+            return reports;
         }
-        else{
+        else {
             Method table_method = symbolTable.getMethod(method);
-            if(table_method == null){
+
+            if (table_method == null) {
                 System.out.println("Error: Unreported class");
-                return reports;
-            }
-            if(table_method.localVariableExists(symbol)){
-                reports.add(newSemanticReport(node, ReportType.ERROR,"VariableRedefinition: Variable " + symbol + " is already defined in the scope"));
-                report_list.add(newSemanticReport(node, ReportType.ERROR,"VariableRedefinition: Variable " + symbol + " is already defined in the scope"));
 
                 return reports;
             }
+
+            if (table_method.localVariableExists(symbol)) {
+                reports.add(newSemanticReport(node, ReportType.ERROR, "VariableRedefinition: Variable " + symbol + " is already defined in the scope"));
+                report_list.add(newSemanticReport(node, ReportType.ERROR, "VariableRedefinition: Variable " + symbol + " is already defined in the scope"));
+
+                return reports;
+            }
+
             table_method.addLocalVariable(varType, varName, false);
         }
 
         return reports;
     }
 
-    public List<Report> verifyArray(JmmNode node, Boolean aBoolean){
+    public List<Report> verifyArray(JmmNode node, Boolean aBoolean) {
         List<Report> reports = new ArrayList<>();
 
         JmmNode child = node.getChildren().get(0);
 
-        if(child.getOptional("type").isEmpty() || child.getOptional("type").isEmpty()){
-            reports.add(newSemanticReport(node, ReportType.ERROR,"TypeMismatch: Expected type: int, got no type."));
-            report_list.add(newSemanticReport(node, ReportType.ERROR,"TypeMismatch: Expected type: int, got no type."));
+        if (child.getOptional("type").isEmpty() || child.getOptional("type").isEmpty()) {
+            reports.add(newSemanticReport(node, ReportType.ERROR, "TypeMismatch: Expected type: int, got no type."));
+            report_list.add(newSemanticReport(node, ReportType.ERROR, "TypeMismatch: Expected type: int, got no type."));
 
             return reports;
         }
-        if(!child.get("type").equals("int")){
-            reports.add(newSemanticReport(node, ReportType.ERROR,"TypeMismatch: Expected type: int, got type " + node.getChildren().get(0).get("type")));
-            report_list.add(newSemanticReport(node, ReportType.ERROR,"TypeMismatch: Expected type: int, got type " + node.getChildren().get(0).get("type")));
+
+        if (!child.get("type").equals("int")) {
+            reports.add(newSemanticReport(node, ReportType.ERROR, "TypeMismatch: Expected type: int, got type " + node.getChildren().get(0).get("type")));
+            report_list.add(newSemanticReport(node, ReportType.ERROR, "TypeMismatch: Expected type: int, got type " + node.getChildren().get(0).get("type")));
 
             return reports;
         }
@@ -679,42 +679,48 @@ public class ExpressionVisitor extends PostorderJmmVisitor<Boolean, List<Report>
         return reports;
     }
 
-    public List<Report> addValueToNodeOptional(JmmNode node, Boolean aBoolean){
+    public List<Report> addValueToNodeOptional(JmmNode node, Boolean aBoolean) {
         node.put("type", "");
         node.put("is_array", "");
         List<Report> reports = new ArrayList<>();
 
         Method method = NodeFindingMethods.FindParentMethod(node, symbolTable);
-        ValueSymbol symbol = (ValueSymbol) NodeFindingMethods.getVariable(method, symbolTable, node.get("name"));
+        ValueSymbol symbol = NodeFindingMethods.getVariable(method, symbolTable, node.get("name"));
 
-        if(symbol == null){
-            if(node.getParent().getKind().equals("FCall")){
-                for(String import_name: symbolTable.getImports()){
-                    if(node.get("name").equals(import_name)){
+        if (symbol == null) {
+            if (node.getParent().getKind().equals("FCall")) {
+                for (String import_name : symbolTable.getImports()) {
+                    if (node.get("name").equals(import_name))
                         return reports;
-                    }
                 }
+
                 //Assume it's a static method call otherwise
                 return reports;
             }
+
             //In the case of variable declarations where the value isn't in the symbol table yet
-            reports.add(newSemanticReport(node, ReportType.ERROR,"UndeclaredVariable: Cannot resolve symbol " + node.getOptional("name")));
-            report_list.add(newSemanticReport(node, ReportType.ERROR,"UndeclaredVariable: Cannot resolve symbol " + node.getOptional("name")));
+            reports.add(newSemanticReport(node, ReportType.ERROR, "UndeclaredVariable: Cannot resolve symbol " + node.getOptional("name")));
+            report_list.add(newSemanticReport(node, ReportType.ERROR, "UndeclaredVariable: Cannot resolve symbol " + node.getOptional("name")));
+
             return reports;
         }
+
         node.put("type", symbol.getType().getName());
         node.put("is_array", String.valueOf(symbol.getType().isArray()));
+
         return reports;
     }
 
-    public List<Report> verifyIfStatement(JmmNode node, Boolean aBoolean){
+    public List<Report> verifyIfStatement(JmmNode node, Boolean aBoolean) {
         List<Report> reports = new ArrayList<>();
 
-        if((! NodeFindingMethods.sameType(node.getChildren().get(0).get("type"), "boolean")) || NodeFindingMethods.sameType(node.getChildren().get(0).get("is_array"), "true")){
+        if ((!NodeFindingMethods.sameType(node.getChildren().get(0).get("type"), "boolean")) || NodeFindingMethods.sameType(node.getChildren().get(0).get("is_array"), "true")) {
             //TODO: Wrong variable type in if statement error
             System.out.println("Wrong type inside of if.");
+
             return reports;
         }
+
         return reports;
     }
 
@@ -723,52 +729,46 @@ public class ExpressionVisitor extends PostorderJmmVisitor<Boolean, List<Report>
         node.put("is_array", "");
         List<Report> reports = new ArrayList<>();
 
-        Boolean invalid_type = false;
-        Boolean invalid_array = false;
-
         JmmNode child_node = node.getChildren().get(0);
 
-
-        if(NodeFindingMethods.sameType(child_node.getOptional("type"), "boolean")) {
+        if (NodeFindingMethods.sameType(child_node.getOptional("type"), "boolean")) {
             if (NodeFindingMethods.sameType(child_node.getOptional("is_array"), "false")) {
                 if (child_node.getKind().equals("Identifier")) {
                     if (!variablesNotDeclared(child_node, reports)) {
                         node.put("type", "boolean");
                         node.put("is_array", "false");
+
                         return reports;
                     }
+
                     //TODO: Add non declared variable report here
                     System.out.println("(Negate) variable not declared.");
+
                     return reports;
                 }
-                //Any type gets converted to boolean aswell
+
+                // Any type gets converted to boolean aswell
                 node.put("type", "boolean");
                 node.put("is_array", "false");
                 return reports;
             }
-            else{
-                invalid_array = true;
-            }
-        }
-        else{
-            invalid_type = true;
         }
 
-        if(invalid_type || invalid_array) {
-            String report_string = "TypeMismatch: Operator '!' cannot be applied to ";
-            report_string += NodeFindingMethods.getTypeStringReport(child_node);
-            reports.add(newSemanticReport(node, ReportType.ERROR, report_string));
-            report_list.add(newSemanticReport(node, ReportType.ERROR, report_string));
 
-            //TODO: Add wrong type variable report here
-            System.out.println(report_string);
-            node.put("type", "");
-            node.put("is_array", "");
-        }
+        String report_string = "TypeMismatch: Operator '!' cannot be applied to ";
+        report_string += NodeFindingMethods.getTypeStringReport(child_node);
+        reports.add(newSemanticReport(node, ReportType.ERROR, report_string));
+        report_list.add(newSemanticReport(node, ReportType.ERROR, report_string));
+
+        //TODO: Add wrong type variable report here
+        System.out.println(report_string);
+        node.put("type", "");
+        node.put("is_array", "");
+
         return reports;
     }
 
-    public List<Report> defaultVisit(JmmNode node, Boolean aBoolean){
+    public List<Report> defaultVisit(JmmNode node, Boolean aBoolean) {
         return new ArrayList<>();
     }
 }

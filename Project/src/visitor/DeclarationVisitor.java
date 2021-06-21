@@ -21,7 +21,6 @@ public class DeclarationVisitor extends PreorderJmmVisitor<List<Report>, Boolean
     public DeclarationVisitor() {
         addVisit("ImportDeclaration", this::importDeclaration);
         addVisit("ClassDeclaration", this::classDeclaration);
-        //addVisit("VarDeclaration", this::varDeclaration);
         addVisit("MethodDeclaration", this::methodDeclaration);
 
         //addVisit("Less_Than", (node, reports) -> this.visitOp(node, reports)); // Method reference
@@ -29,12 +28,12 @@ public class DeclarationVisitor extends PreorderJmmVisitor<List<Report>, Boolean
     }
 
     private boolean importDeclaration(JmmNode node, List<Report> reports) {
-        String importString = node.get("name");
+        StringBuilder importString = new StringBuilder(node.get("name"));
 
-        for (JmmNode child : node.getChildren()) {
-            importString += child.get("name");
-        }
-        symbolTable.addImport(importString);
+        for (JmmNode child : node.getChildren()) 
+            importString.append(child.get("name"));
+        
+        symbolTable.addImport(importString.toString());
 
         return true;
     }
@@ -82,7 +81,6 @@ public class DeclarationVisitor extends PreorderJmmVisitor<List<Report>, Boolean
     }
 
     private Boolean visitOp(JmmNode node, List<Report> reports) {
-        //System.out.println("OP: " + node + " -> " + node.get("op"));
         System.out.println("Found node: " + node.getKind());
         var children = node.getChildren();
         System.out.println("Has n children: " + children.size());
